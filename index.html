@@ -1,0 +1,1442 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<title>Smart Travel Finance | คำนวณค่าใช้จ่ายไปราชการ</title>
+
+<style>
+:root{
+--g:#146b52;
+--g2:#e8f5ef;
+--ink:#18332b;
+--muted:#64766f;
+--line:#d9e6df;
+--bg:#f4f7f5;
+--white:#fff;
+--gold:#c8952e;
+--danger:#a33b3b
+}
+
+*{
+box-sizing:border-box
+}
+
+body{
+margin:0;
+background:var(--bg);
+color:var(--ink);
+font-family:system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;
+line-height:1.55
+}
+
+.wrap{
+max-width:1100px;
+margin:auto;
+padding:18px
+}
+
+.hero{
+background:linear-gradient(135deg,#0e4d3b,#238064);
+color:#fff;
+border-radius:24px;
+padding:28px;
+margin-bottom:16px
+}
+
+.eyebrow{
+font-size:12px;
+font-weight:800;
+letter-spacing:.08em;
+opacity:.8
+}
+
+.hero h1{
+font-size:clamp(25px,5vw,38px);
+line-height:1.25;
+margin:8px 0
+}
+
+.hero p{
+margin:0;
+color:#e2f2eb
+}
+
+.nav{
+display:flex;
+gap:8px;
+overflow:auto;
+background:#fff;
+border:1px solid var(--line);
+padding:8px;
+border-radius:15px;
+margin-bottom:16px
+}
+
+.nav button{
+white-space:nowrap;
+background:#fff;
+color:var(--ink)
+}
+
+.nav button.active{
+background:var(--g);
+color:#fff
+}
+
+.panel{
+display:none
+}
+
+.panel.active{
+display:block
+}
+
+.grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:16px
+}
+
+.card{
+background:#fff;
+border:1px solid var(--line);
+border-radius:18px;
+padding:20px;
+box-shadow:0 5px 18px #163d2f0b;
+margin-bottom:16px
+}
+
+h2{
+font-size:20px;
+margin:0 0 15px
+}
+
+h3{
+font-size:15px;
+margin:16px 0 8px
+}
+
+.row{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:12px
+}
+
+.field{
+margin-bottom:13px
+}
+
+label{
+display:block;
+font-size:14px;
+font-weight:750;
+margin-bottom:6px
+}
+
+input,select{
+width:100%;
+min-height:45px;
+border:1px solid #cbd9d2;
+border-radius:10px;
+padding:10px 12px;
+font:inherit;
+color:var(--ink);
+background:#fff
+}
+
+input:focus,select:focus{
+outline:3px solid #146b5220;
+border-color:var(--g)
+}
+
+.check{
+display:flex;
+gap:10px;
+background:#f3f8f5;
+padding:12px;
+border-radius:11px;
+margin:10px 0 15px
+}
+
+.check input{
+width:20px;
+min-height:20px;
+margin-top:4px
+}
+
+.check label{
+margin:0
+}
+
+.hint,.small{
+font-size:12px;
+color:var(--muted)
+}
+
+button{
+border:0;
+border-radius:10px;
+padding:12px 15px;
+font:inherit;
+font-weight:750;
+cursor:pointer
+}
+
+.primary{
+background:var(--g);
+color:#fff;
+width:100%
+}
+
+.secondary{
+background:var(--g2);
+color:var(--g)
+}
+
+.actions{
+display:flex;
+gap:10px;
+margin-top:10px
+}
+
+.actions button{
+flex:1
+}
+
+.metrics{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px
+}
+
+.metric{
+border:1px solid var(--line);
+padding:14px;
+border-radius:14px
+}
+
+.metric span{
+display:block;
+color:var(--muted);
+font-size:12px
+}
+
+.metric strong{
+font-size:25px
+}
+
+.total{
+margin-top:12px;
+background:var(--g2);
+border-radius:15px;
+padding:17px
+}
+
+.total .big{
+font-size:31px;
+font-weight:850;
+color:var(--g)
+}
+
+.breakdown{
+font-size:13px;
+color:var(--muted)
+}
+
+.warning{
+margin-top:14px;
+padding:13px;
+background:#fff8e9;
+border-left:4px solid var(--gold);
+border-radius:7px;
+font-size:13px
+}
+
+.error{
+color:var(--danger);
+font-size:13px;
+margin-top:9px
+}
+
+.table-wrap{
+overflow:auto
+}
+
+.rates{
+width:100%;
+border-collapse:collapse;
+font-size:13px
+}
+
+.rates th,
+.rates td{
+border:1px solid var(--line);
+padding:9px;
+text-align:left;
+vertical-align:top
+}
+
+.rates th{
+background:var(--g2)
+}
+
+.rule{
+border-top:1px solid var(--line);
+padding:13px 0
+}
+
+.rule:first-child{
+border-top:0
+}
+
+.rule strong{
+display:block;
+margin-bottom:4px
+}
+
+.badge{
+display:inline-block;
+padding:4px 8px;
+border-radius:999px;
+background:var(--g2);
+color:var(--g);
+font-size:12px;
+font-weight:750
+}
+
+.hidden{
+display:none!important
+}
+
+footer{
+text-align:center;
+color:var(--muted);
+font-size:12px;
+padding:8px
+}
+
+.source a{
+color:var(--g);
+font-weight:700
+}
+
+.print-title{
+display:none
+}
+
+@media(max-width:760px){
+
+.grid{
+grid-template-columns:1fr
+}
+
+.row{
+gap:8px
+}
+
+.hero{
+padding:22px 18px
+}
+
+.card{
+padding:17px
+}
+
+}
+
+@media print{
+
+body{
+background:#fff
+}
+
+.wrap{
+max-width:none;
+padding:0
+}
+
+.nav,
+.no-print{
+display:none!important
+}
+
+.panel.active{
+display:block
+}
+
+.hero{
+background:#fff;
+color:#18332b;
+border:1px solid #aaa
+}
+
+.hero p{
+color:#333
+}
+
+.print-title{
+display:block
+}
+
+.card{
+box-shadow:none;
+break-inside:avoid
+}
+
+}
+</style>
+</head>
+
+<body>
+
+<div class="wrap">
+
+<header class="hero">
+
+<div class="eyebrow">
+SMART FINANCE • TRAVEL EXPENSE
+</div>
+
+<h1>
+คำนวณค่าใช้จ่ายเดินทางไปราชการ
+</h1>
+
+<p>
+วันเดินทาง • ค่าเบี้ยเลี้ยง • ค่าเช่าที่พัก พร้อมสรุปประมาณการในหน้าเดียว
+</p>
+
+</header>
+
+
+<nav class="nav no-print">
+
+<button class="tab active" data-tab="calc">
+🧮 คำนวณค่าใช้จ่าย
+</button>
+
+<button class="tab" data-tab="rates">
+📋 อัตราและสิทธิ
+</button>
+
+<button class="tab" data-tab="rules">
+📚 ระเบียบ / Micro Learning
+</button>
+
+</nav>
+
+
+<section id="calc" class="panel active">
+
+<div class="grid">
+
+<div>
+
+<div class="card">
+
+<h2>
+1. ข้อมูลการเดินทาง
+</h2>
+
+
+<div class="row">
+
+<div class="field">
+
+<label>
+วันออกเดินทาง
+</label>
+
+<input id="sd" type="date">
+
+</div>
+
+
+<div class="field">
+
+<label>
+เวลาออกเดินทาง
+</label>
+
+<input id="st" type="time" value="08:30">
+
+</div>
+
+</div>
+
+
+<div class="row">
+
+<div class="field">
+
+<label>
+วันเดินทางกลับ
+</label>
+
+<input id="ed" type="date">
+
+</div>
+
+
+<div class="field">
+
+<label>
+เวลากลับถึง
+</label>
+
+<input id="et" type="time" value="16:30">
+
+</div>
+
+</div>
+
+
+<div class="field">
+
+<label>
+ระดับ/กลุ่มสิทธิ
+</label>
+
+<select id="class">
+
+<option value="low">
+กลุ่ม 240 / ที่พัก 1,500–850 / เหมาจ่าย 800
+</option>
+
+<option value="mid">
+กลุ่ม 270 / ที่พัก 2,200–1,200 / เหมาจ่าย 1,200
+</option>
+
+<option value="high">
+กลุ่มระดับสูง / ที่พัก 2,500–1,400 / เหมาจ่าย 1,200
+</option>
+
+</select>
+
+</div>
+
+
+<div class="check">
+
+<input id="overnight" type="checkbox">
+
+<div>
+
+<label for="overnight">
+มีการพักแรม
+</label>
+
+<div class="hint">
+ใช้เกณฑ์นับเศษเวลาสำหรับกรณีพักแรม
+</div>
+
+</div>
+
+</div>
+
+
+<div class="field">
+
+<label>
+จำนวนมื้อที่มีผู้จัดเลี้ยง
+</label>
+
+<input
+id="meals"
+type="number"
+min="0"
+max="99"
+value="0"
+>
+
+<div class="hint">
+ระบบจะหัก 1/3 ของอัตราเบี้ยเลี้ยงต่อมื้อจากประมาณการ
+</div>
+
+</div>
+
+
+<button class="primary" id="calcBtn">
+คำนวณ
+</button>
+
+<div id="err" class="error"></div>
+
+</div>
+
+
+<div class="card">
+
+<h2>
+2. ค่าเช่าที่พัก
+</h2>
+
+
+<div class="field">
+
+<label>
+วิธีเบิก
+</label>
+
+<select id="lodgingMode">
+
+<option value="actual">
+จ่ายจริง
+</option>
+
+<option value="flat">
+เหมาจ่าย
+</option>
+
+</select>
+
+</div>
+
+
+<div class="field" id="roomBox">
+
+<label>
+ประเภทห้อง
+</label>
+
+<select id="room">
+
+<option value="single">
+ห้องพักคนเดียว
+</option>
+
+<option value="double">
+ห้องพักคู่
+</option>
+
+</select>
+
+</div>
+
+
+<div class="field">
+
+<label>
+จำนวนคืน
+</label>
+
+<input
+id="nights"
+type="number"
+min="0"
+value="0"
+>
+
+</div>
+
+
+<div class="field" id="actualBox">
+
+<label>
+ค่าห้องที่จ่ายจริงต่อคืน (บาท)
+</label>
+
+<input
+id="roomCost"
+type="number"
+min="0"
+value="0"
+>
+
+<div id="cap" class="hint"></div>
+
+</div>
+
+
+<button
+class="secondary"
+style="width:100%"
+id="fillNights"
+>
+ตั้งจำนวนคืนจากวันเดินทาง
+</button>
+
+</div>
+
+</div>
+
+
+<div>
+
+<div class="card">
+
+<h2>
+3. ผลการคำนวณ
+</h2>
+
+
+<div class="metrics">
+
+<div class="metric">
+
+<span>
+ระยะเวลารวม
+</span>
+
+<strong id="duration">
+—
+</strong>
+
+<span id="duration2">
+—
+</span>
+
+</div>
+
+
+<div class="metric">
+
+<span>
+วันเบี้ยเลี้ยง
+</span>
+
+<strong id="days">
+—
+</strong>
+
+<span id="days2">
+—
+</span>
+
+</div>
+
+</div>
+
+
+<div class="total">
+
+<div>
+ค่าเบี้ยเลี้ยงหลังหักมื้ออาหาร
+</div>
+
+<div class="big" id="allowance">
+— บาท
+</div>
+
+<div class="breakdown" id="allowanceDetail">
+—
+</div>
+
+</div>
+
+
+<div class="total">
+
+<div>
+ค่าเช่าที่พักประมาณการ
+</div>
+
+<div class="big" id="lodging">
+— บาท
+</div>
+
+<div class="breakdown" id="lodgingDetail">
+—
+</div>
+
+</div>
+
+
+<div class="total">
+
+<div>
+รวมเบี้ยเลี้ยง + ที่พัก
+</div>
+
+<div class="big" id="grand">
+— บาท
+</div>
+
+</div>
+
+
+<div class="warning">
+
+<strong>
+สำคัญ:
+</strong>
+
+ผลเป็นประมาณการเพื่อช่วยตรวจสอบเบื้องต้น
+ต้องทวนสอบคำสั่งเดินทาง สิทธิ อัตรา หลักฐาน
+และเงื่อนไขเฉพาะกรณีก่อนเบิกจ่ายจริง
+
+</div>
+
+</div>
+
+
+<div class="card">
+
+<h2>
+สรุปหลักเกณฑ์ที่ระบบใช้
+</h2>
+
+
+<div class="rule">
+
+<strong>
+นับเวลา
+</strong>
+
+<span class="small">
+เริ่มนับจากออกจากที่อยู่/สถานที่ปฏิบัติราชการปกติถึงกลับถึงสถานที่ดังกล่าว
+</span>
+
+</div>
+
+
+<div class="rule">
+
+<strong>
+ไม่มีพักแรม
+</strong>
+
+<span class="small">
+24 ชม. = 1 วัน, เกิน 12 ชม. = 1 วัน, เกิน 6 ชม. = ½ วัน
+</span>
+
+</div>
+
+
+<div class="rule">
+
+<strong>
+มีพักแรม
+</strong>
+
+<span class="small">
+24 ชม. = 1 วัน และเศษเกิน 12 ชม. = เพิ่ม 1 วัน
+</span>
+
+</div>
+
+
+<div class="rule">
+
+<strong>
+ที่พัก
+</strong>
+
+<span class="small">
+จ่ายจริงให้ไม่เกินเพดานตามสิทธิ หรือเลือกเหมาจ่ายตามอัตรา
+</span>
+
+</div>
+
+</div>
+
+
+<div class="card no-print">
+
+<button
+class="primary"
+onclick="window.print()"
+>
+🖨 พิมพ์ / บันทึกเป็น PDF
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<section id="rates" class="panel">
+
+<div class="card">
+
+<h2>
+อัตราที่ใช้ในระบบ
+</h2>
+
+
+<div class="table-wrap">
+
+<table class="rates">
+
+<thead>
+
+<tr>
+
+<th>
+กลุ่มสิทธิ
+</th>
+
+<th>
+เบี้ยเลี้ยง/วัน
+</th>
+
+<th>
+ที่พักจ่ายจริง ห้องเดี่ยว
+</th>
+
+<th>
+ห้องคู่
+</th>
+
+<th>
+ที่พักเหมาจ่าย
+</th>
+
+</tr>
+
+</thead>
+
+
+<tbody>
+
+<tr>
+
+<td>
+ประเภททั่วไป ปฏิบัติงาน/ชำนาญงาน/อาวุโส;
+วิชาการ ปฏิบัติการ/ชำนาญการ/ชำนาญการพิเศษ;
+อำนวยการต้น
+</td>
+
+<td>
+240
+</td>
+
+<td>
+1,500
+</td>
+
+<td>
+850
+</td>
+
+<td>
+800
+</td>
+
+</tr>
+
+
+<tr>
+
+<td>
+ทั่วไป ทักษะพิเศษ;
+วิชาการ เชี่ยวชาญ;
+อำนวยการสูง;
+บริหารต้น/สูง
+</td>
+
+<td>
+270
+</td>
+
+<td>
+2,200
+</td>
+
+<td>
+1,200
+</td>
+
+<td>
+1,200
+</td>
+
+</tr>
+
+
+<tr>
+
+<td>
+วิชาการทรงคุณวุฒิ;
+บริหารระดับสูง/ระดับ 10 ขึ้นไป
+และตำแหน่งเทียบเท่า
+</td>
+
+<td>
+270
+</td>
+
+<td>
+2,500
+</td>
+
+<td>
+1,400
+</td>
+
+<td>
+1,200
+</td>
+
+</tr>
+
+</tbody>
+
+</table>
+
+</div>
+
+
+<p class="hint">
+
+กรณีเดินทางเป็นหมู่คณะ ต้องใช้วิธีเบิกค่าที่พักแบบเดียวกันทั้งคณะ
+และมีเงื่อนไขการพักคู่/พักเดี่ยวตามระเบียบ
+
+</p>
+
+</div>
+
+</section>
+
+
+<section id="rules" class="panel">
+
+<div class="card">
+
+<h2>
+ระเบียบและความรู้แบบสั้น
+</h2>
+
+
+<div class="rule">
+
+<span class="badge">
+1
+</span>
+
+<strong>
+ค่าใช้จ่ายที่เกี่ยวข้อง
+</strong>
+
+<span class="small">
+การเดินทางไปราชการชั่วคราวมีค่าเบี้ยเลี้ยง
+ค่าเช่าที่พัก ค่าพาหนะ และค่าใช้จ่ายอื่นที่จำเป็น
+</span>
+
+</div>
+
+
+<div class="rule">
+
+<span class="badge">
+2
+</span>
+
+<strong>
+การนับเวลา
+</strong>
+
+<span class="small">
+นับตั้งแต่ออกจากสถานที่อยู่หรือสถานที่ปฏิบัติราชการปกติ
+จนกลับถึงสถานที่ดังกล่าว
+โดยใช้เกณฑ์แตกต่างกันระหว่างพักแรมและไม่พักแรม
+</span>
+
+</div>
+
+
+<div class="rule">
+
+<span class="badge">
+3
+</span>
+
+<strong>
+ค่าเช่าที่พัก
+</strong>
+
+<span class="small">
+เลือกเบิกจ่ายจริงหรือเหมาจ่ายได้ตามสิทธิ;
+หากเดินทางเป็นหมู่คณะต้องเลือกแบบเดียวกันทั้งคณะ
+</span>
+
+</div>
+
+
+<div class="rule">
+
+<span class="badge">
+4
+</span>
+
+<strong>
+อาหารที่มีผู้จัดเลี้ยง
+</strong>
+
+<span class="small">
+กรณีมีอาหารจัดเลี้ยง ให้คำนวณการหักค่าเบี้ยเลี้ยง
+ตามหลักเกณฑ์ที่ใช้บังคับ
+ไม่ควรใช้ผลจากระบบโดยไม่ตรวจสอบเงื่อนไขของงานนั้น
+</span>
+
+</div>
+
+
+<p class="source">
+
+แหล่งอ้างอิง:
+
+<a
+href="https://www.cgd.go.th/"
+target="_blank"
+>
+กรมบัญชีกลาง
+</a>
+
+และ
+
+<a
+href="https://spm.thaigov.go.th/th/sub-org-10-176"
+target="_blank"
+>
+สำนักเลขาธิการนายกรัฐมนตรี — รวมระเบียบกระทรวงการคลังฯ
+</a>
+
+</p>
+
+
+<p class="hint">
+
+ฐานหลักเกณฑ์ที่นำมาออกแบบมาจากไฟล์ Excel
+“โปรแกรมคำนวณวันเดินทาง (1).xls”
+ซึ่งใช้การคำนวณส่วนต่างวัน/ชั่วโมง/นาที
+และเสริมโมดูลเบี้ยเลี้ยงกับที่พักตามหลักเกณฑ์ข้างต้น
+
+</p>
+
+</div>
+
+</section>
+
+
+<footer>
+
+Smart Travel Finance • เครื่องมือช่วยคำนวณเบื้องต้นสำหรับงานการเงินภาครัฐ
+
+</footer>
+
+</div>
+
+
+<script>
+
+const R={
+
+low:{
+allow:240,
+single:1500,
+double:850,
+flat:800
+},
+
+mid:{
+allow:270,
+single:2200,
+double:1200,
+flat:1200
+},
+
+high:{
+allow:270,
+single:2500,
+double:1400,
+flat:1200
+}
+
+};
+
+
+const $=id=>document.getElementById(id);
+
+
+function updateCap(){
+
+const r=R[$('class').value];
+
+$('cap').textContent=
+
+$('room').value==='single'
+
+?`เพดานจ่ายจริง: ไม่เกิน ${r.single.toLocaleString()} บาท/คืน`
+
+:`เพดานจ่ายจริง: ไม่เกิน ${r.double.toLocaleString()} บาท/คืน`;
+
+}
+
+
+$('class').onchange=updateCap;
+
+$('room').onchange=updateCap;
+
+
+$('lodgingMode').onchange=()=>{
+
+const flat=$('lodgingMode').value==='flat';
+
+$('roomBox').classList.toggle('hidden',flat);
+
+$('actualBox').classList.toggle('hidden',flat);
+
+};
+
+
+$('fillNights').onclick=()=>{
+
+if($('sd').value&&$('ed').value){
+
+const a=new Date($('sd').value);
+
+const b=new Date($('ed').value);
+
+$('nights').value=Math.max(
+0,
+Math.round((b-a)/86400000)
+);
+
+}
+
+else{
+
+$('err').textContent=
+'กรุณากรอกวันเดินทางก่อน';
+
+}
+
+};
+
+
+function calc(){
+
+$('err').textContent='';
+
+
+if(
+!$('sd').value||
+!$('ed').value||
+!$('st').value||
+!$('et').value
+){
+
+$('err').textContent=
+'กรุณากรอกวันและเวลาเดินทางให้ครบ';
+
+return;
+
+}
+
+
+const a=new Date(
+$('sd').value+'T'+$('st').value+':00'
+);
+
+const b=new Date(
+$('ed').value+'T'+$('et').value+':00'
+);
+
+
+const m=Math.round(
+(b-a)/60000
+);
+
+
+if(m<=0){
+
+$('err').textContent=
+'วันและเวลากลับต้องอยู่หลังเวลาออกเดินทาง';
+
+return;
+
+}
+
+
+const r=R[$('class').value];
+
+const overnight=$('overnight').checked;
+
+const full=Math.floor(m/1440);
+
+const rem=m%1440;
+
+let days;
+
+
+if(overnight)
+
+days=full+(rem>720?1:0);
+
+else
+
+days=
+full+
+(
+rem>720
+?1
+:rem>360
+?.5
+:0
+);
+
+
+const meals=
+Math.max(
+0,
+Number($('meals').value)||0
+);
+
+
+const mealDeduct=
+meals*(r.allow/3);
+
+
+const allow=
+Math.max(
+0,
+days*r.allow-mealDeduct
+);
+
+
+const nights=
+Math.max(
+0,
+Number($('nights').value)||0
+);
+
+
+let lodge=0;
+
+let ltext='';
+
+
+if($('lodgingMode').value==='flat'){
+
+lodge=nights*r.flat;
+
+ltext=
+`${nights} คืน × ${r.flat.toLocaleString()} บาท (เหมาจ่าย)`;
+
+}
+
+else{
+
+const cap=
+$('room').value==='single'
+?r.single
+:r.double;
+
+const actual=
+Math.max(
+0,
+Number($('roomCost').value)||0
+);
+
+const used=
+Math.min(actual,cap);
+
+lodge=nights*used;
+
+ltext=
+`${nights} คืน × ${used.toLocaleString()} บาท/คืน (เพดาน ${cap.toLocaleString()})`;
+
+}
+
+
+const h=Math.floor(m/60);
+
+const mm=m%60;
+
+
+$('duration').textContent=
+`${full} วัน`;
+
+$('duration2').textContent=
+`${h} ชม. ${mm} นาที`;
+
+
+$('days').textContent=
+days;
+
+$('days2').textContent=
+overnight
+?'กรณีพักแรม'
+:'กรณีไม่พักแรม';
+
+
+$('allowance').textContent=
+allow.toLocaleString(
+'th-TH',
+{
+maximumFractionDigits:2
+}
+)
++' บาท';
+
+
+$('allowanceDetail').textContent=
+`${days} วัน × ${r.allow} = ${(days*r.allow).toLocaleString()} บาท − หักอาหาร ${mealDeduct.toLocaleString('th-TH',{maximumFractionDigits:2})} บาท`;
+
+
+$('lodging').textContent=
+lodge.toLocaleString(
+'th-TH',
+{
+maximumFractionDigits:2
+}
+)
++' บาท';
+
+
+$('lodgingDetail').textContent=
+ltext;
+
+
+$('grand').textContent=
+(allow+lodge).toLocaleString(
+'th-TH',
+{
+maximumFractionDigits:2
+}
+)
++' บาท';
+
+}
+
+
+$('calcBtn').onclick=calc;
+
+updateCap();
+
+
+document.querySelectorAll('.tab').forEach(
+
+btn=>btn.onclick=()=>{
+
+document
+.querySelectorAll('.tab')
+.forEach(
+x=>x.classList.remove('active')
+);
+
+document
+.querySelectorAll('.panel')
+.forEach(
+x=>x.classList.remove('active')
+);
+
+btn.classList.add('active');
+
+$(btn.dataset.tab)
+.classList.add('active');
+
+}
+
+);
+
+</script>
+
+</body>
+</html>
